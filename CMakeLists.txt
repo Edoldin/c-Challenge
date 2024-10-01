@@ -1,40 +1,41 @@
 cmake_minimum_required(VERSION 3.0)
 project(CarRentalSystem)
 
-###############################################################################
-## file globbing ##############################################################
-###############################################################################
- 
-# these instructions search the directory tree when CMake is
-# invoked and put all files that match the pattern in the variables
-# `sources` and `data`
-file(GLOB sources_view       view/*)
-file(GLOB sources_controller controller/*h)
-file(GLOB sources_model      sources_model/*)
-file(GLOB sources_main       src/*.cpp src/*.h)
-file(GLOB_RECURSE sources_test test/*.cpp test/*.h)
-file(GLOB_RECURSE data resources/*)
+# Set C++17 standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Wpedantic")
-#set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Wpedantic")
-# you can use set(sources src/main.cpp) etc if you don't want to
-# use globbing to find files automatically
+# Enable compile_commands.json generation
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-###############################################################################
-## target definitions #########################################################
-###############################################################################
+# Include directories
+include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/test)
+include_directories(${PROJECT_SOURCE_DIR}/3rdParty/cpp-httplib/)
 
-# add the data to the target, so it becomes visible in some IDE
-add_executable(CarRentalSystem ${sources_main} ${sources_model} ${sources_controller} ${sources_view} ${data})
-
+# File globbing (if needed)
+file(GLOB_RECURSE sources_view ${PROJECT_SOURCE_DIR}/src/view/*.cpp)
+file(GLOB sources_controller ${PROJECT_SOURCE_DIR}/src/controller/*.cpp)
+file(GLOB sources_model ${PROJECT_SOURCE_DIR}/src/model/*.cpp)
+file(GLOB sources_main ${PROJECT_SOURCE_DIR}/src/main.cpp) # Only main.cpp
+file(GLOB_RECURSE sources_test test/*.cpp)
+message("wasd")
+# Add CarRentalSystem executable
+add_executable(CarRentalSystem ${sources_main} ${sources_model} ${sources_controller} ${sources_view})
 
 set_target_properties(CarRentalSystem PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+) 
+message("Sources for view/client: ${sources_view}")
+# Compiler options for CarRentalSystem
+target_compile_options(CarRentalSystem PUBLIC -Wall -Wextra -Wpedantic -Wfloat-conversion)
+
+# Add test executable
+add_executable(CarRentalSystemTest ${sources_test} ${sources_model} ${sources_controller} ${sources_view})
+
+# Compiler options for CarRentalSystemTest
+target_compile_options(CarRentalSystemTest PUBLIC -Wall -Wextra -Wpedantic)
+
+set_target_properties(CarRentalSystemTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
-# just for example add some compiler flags
-target_compile_options(CarRentalSystem PUBLIC -std=c++17 -Wall -Wfloat-conversion)
-
-# this lets me include files relative to the root source directory with a <> pair
-target_include_directories(CarRentalSystem PUBLIC src/main)
-
-add_executable(test ${sources_test} ${sources_model} ${sources_controller} ${sources_view} ${data})
