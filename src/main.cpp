@@ -2,6 +2,7 @@
 #include <controller/ManageTransactionController.hpp>
 #include <controller/ManageUsersController.hpp>
 #include <view/client/ClientFactory.hpp>
+#include <view/db/DatabaseView.hpp>
 
 int main() {
   //DB
@@ -44,6 +45,11 @@ int main() {
                    "exist.\n";
     }
   });
+
+  clientView->getUserChargesCallback(
+      [&](const std::string& userId, std::ostream& os) {
+        transactionController.getUserCharges(userId, os);
+      });
 
   clientView->setPrintUsersCallback(
       [&](std::ostream& os) { userController.printAllUsers(os); });

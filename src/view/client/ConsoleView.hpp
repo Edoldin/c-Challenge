@@ -15,6 +15,7 @@ class ConsoleView : public ClientInterface {
     while (running) {
       displayMenu();
       int option;
+      //bug only support numbers
       std::cin >> option;
       switch (option) {
         case 1:
@@ -107,8 +108,7 @@ class ConsoleView : public ClientInterface {
     endTransactionCallback_(transactionId);  // Call the provided callback
   }
 
-  void getCharges()
-  {
+  void getCharges() {
     if (!getUserChargesCallback_)
       return;
 
